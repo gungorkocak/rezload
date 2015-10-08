@@ -9,7 +9,7 @@ var ImageResizer = function (file, options) {
 
   this._canvas = document.createElement("canvas");
   this._canvas.id = "imageResizer";
-  this._canvas.style.visibility = "hidden";
+  // this._canvas.style.visibility = "hidden";
   this._context = this._canvas.getContext("2d");
 
   this._resizingCanvas = document.createElement("canvas");
@@ -39,6 +39,8 @@ ImageResizer.prototype.prepare = function (next) {
     this._canvas.width = this.image.width;
     this._canvas.height = this.image.height;
 
+    this._context.drawImage(this.image, 0, 0, this.image.width, this.image.height);
+
     next(null, this.image);
   }).bind(this);
 
@@ -47,12 +49,13 @@ ImageResizer.prototype.prepare = function (next) {
 
 ImageResizer.prototype.resize = function (next, results) {
   var resizer = (function (version, next) {
-    this._resizingCanvas.width = version.width;
-    this._resizingCanvas.height = version.height;
+    var canvas = document.createElement('canvas');
+    canvas.width = version.width;
+    canvas.height = version.height;
 
-    this._resizingContext.drawImage(this._resizingCanvas, 0, 0);
+    canvas.getContext('2d').drawImage(this._canvas, 0, 0, version.width, version.height);
 
-    this._resizingCanvas.toBlob(function (blob) {
+    canvas.toBlob(function (blob) {
       blob.version = version.width + 'x' + version.height
       blob.name = this.fileName + '_' + blob.version + '.' + this.fileExtension;
       blob.lastModifiedDate = new Date();
