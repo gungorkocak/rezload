@@ -102,7 +102,7 @@
             $("#progresses").append(markup);
           }
           else {
-            $(".current", "#" + file.version).text("%" + file.progress);
+            $(".current", "#" + file.version).css("width", file.progress + "%");
           }
 
           // Fetch progress for different versions.
