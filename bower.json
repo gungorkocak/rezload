@@ -1,0 +1,21 @@
+{
+  "name": "image-uploader",
+  "version": "0.0.0",
+  "authors": [
+    "Gungor Kocak <gngr.kck@gmail.com>"
+  ],
+  "description": "resize to different versions and upload to s3",
+  "main": "index.js",
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jquery": "~2.1.4",
+    "blueimp-canvas-to-blob": "~2.2.0"
+  }
+}
