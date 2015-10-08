@@ -9,6 +9,29 @@
     <script src="./image-uploader.js"></script>
     <script src="./rezload.js"></script>
     <script src="./rezload.jquery.js"></script>
+    <style>
+      .version-progress > div {
+        display: inline-block;
+      }
+
+      .version-progress .name {
+        padding: 20px;
+        width: 100px;
+      }
+
+      .progress {
+        width: 300px;
+        height: 10px;
+        background: #CFCFCF;
+      }
+
+
+      .current {
+        background: green;
+        width: 0%;
+        height: 100%;
+      }
+    </style>
   </head>
   <body>
     <h1>
@@ -19,7 +42,7 @@
       <form>
         <input id="file" type="file"></input>
       </form>
-      <div id="uploader">
+      <div id="progresses">
       </div>
       <div>
         <button type="submit">Upload</button>
@@ -62,11 +85,26 @@
         Upload on form submit.
       */
       $("button[type=submit]").on("click", function (e) {
-
-        /*
-          Listen progress events.
-        */
         $('#file').on('onprogress', function (e, file) {
+          /*
+            Little progress ui.
+          */
+          if($("#" + file.version).length === 0) {
+            var markup =
+              "<div class='version-progress' id='" +
+              file.version +
+              "'><div class='name'>" +
+              file.version +
+              "</div><div class='progress'><div class='current' style='width: " +
+              file.progress + "%;'>" +
+              "</div></div></div>";
+
+            $("#progresses").append(markup);
+          }
+          else {
+            $(".current", "#" + file.version).text("%" + file.progress);
+          }
+
           // Fetch progress for different versions.
           if(file.version === "original") {
             console.log("original progress:", file.progress);
@@ -82,17 +120,17 @@
         /*
            Listen done events
         */
-        $("#file").on("uploaddone", function (e, err, file, response) {
-          if(file.version === "original") {
-            console.log("upload done for original image", err, file, response);
-          }
-          else if(file.version === "500x500") {
-            console.log("upload done for 500x500 image", err, file, response);
-          }
-          else if(file.version === "128x128") {
-            console.log("upload done for 500x500 image", err, file, response);
-          }
-        });
+        // $("#file").on("uploaddone", function (e, err, file, response) {
+        //   if(file.version === "original") {
+        //     console.log("upload done for original image", err, file, response);
+        //   }
+        //   else if(file.version === "500x500") {
+        //     console.log("upload done for 500x500 image", err, file, response);
+        //   }
+        //   else if(file.version === "128x128") {
+        //     console.log("upload done for 500x500 image", err, file, response);
+        //   }
+        // });
 
         // $('#file').rezload('resize', function (err, files) {
         //   console.log("resized images are:", files);
