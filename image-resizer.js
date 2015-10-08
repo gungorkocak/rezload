@@ -54,8 +54,6 @@ ImageResizer.prototype.resize = function (next, results) {
       blob.name = this.fileName + '_' + version.width + 'x' + version.height + '.' + this.fileExtension;
       blob.lastModifiedDate = new Date();
 
-      console.log("Returning blob", blob);
-
       return next(null, blob);
     }.bind(this), this.file.type);
   }).bind(this);
@@ -79,6 +77,7 @@ ImageResizer.prototype.perform = function (next) {
 
     if(err) return next(err);
 
+    results.resize.unshift(this.file);
     return next(null, results.resize);
   }).bind(this));
 }

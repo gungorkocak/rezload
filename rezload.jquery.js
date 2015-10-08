@@ -22,7 +22,10 @@
     }
     else {
       options = method;
-      methods.init(this[0].files[0], options);
+
+      this.on('change', function() {
+        methods.init(this.files[0], options);
+      });
     }
 
     return this;
