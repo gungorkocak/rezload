@@ -1,7 +1,6 @@
 var ImageResizer = function (file, options) {
   this.setFile(file);
 
-  this.file = file;
   this.image = new Image();
 
   this.options = options;
@@ -20,6 +19,10 @@ var ImageResizer = function (file, options) {
 ImageResizer.prototype.setFile = function (file) {
   if(typeof(file) === "object" && file.type.match("image.*")) {
     this.file = file;
+
+    var lastDotIndex = file.name.lastIndexOf(".");
+    this.fileName = file.name.substring(0, lastDotIndex);
+    this.fileExtension = file.name.substring(lastDotIndex).slice(1);
   }
   else {
     throw new Error("File is not an image");
@@ -48,8 +51,13 @@ ImageResizer.prototype.resize = function (next, results) {
     this._resizingContext.drawImage(this._resizingCanvas, 0, 0);
 
     this._resizingCanvas.toBlob(function (blob) {
+      blob.name = this.fileName + '_' + version.width + 'x' + version.height + '.' + this.fileExtension;
+      blob.lastModifiedDate = new Date();
+
+      console.log("Returning blob", blob);
+
       return next(null, blob);
-    });
+    }.bind(this), this.file.type);
   }).bind(this);
 
   var resizeFinished = (function (err, files) {
