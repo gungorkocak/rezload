@@ -9,7 +9,6 @@ var ImageResizer = function (file, options) {
 
   this._canvas = document.createElement("canvas");
   this._canvas.id = "imageResizer";
-  // this._canvas.style.visibility = "hidden";
   this._context = this._canvas.getContext("2d");
 
   this._resizingCanvas = document.createElement("canvas");
