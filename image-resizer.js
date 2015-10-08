@@ -74,23 +74,3 @@ ImageResizer.prototype.perform = function (next) {
     return next(null, results.resize);
   }).bind(this));
 }
-
-ImageResizer.test = function (selector) {
-  var imageres =
-    new ImageResizer($(selector)[0].files[0], {
-      versions: {
-        "medium": {
-          width: 512,
-          height: 512
-        },
-        "small": {
-          width: 128,
-          height: 128
-        }
-      }
-    });
-
-  imageres.perform(function (err, files) {
-    console.log("returned resized files:", files);
-  });
-}
