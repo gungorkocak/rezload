@@ -2,10 +2,19 @@ var ImageResizer = function (file, options) {
   this.setFile(file);
 
   this.file = file;
+  this.image = new Image();
 
   this.options = options;
 
   this.versions = [];
+
+  this._canvas = document.createElement("canvas");
+  this._canvas.id = "imageResizer";
+  this._canvas.style.visibility = "hidden";
+  this._context = this._canvas.getContext("2d");
+
+  this._resizingCanvas = document.createElement("canvas");
+  this._resizingContext = this._resizingCanvas.getContext("2d");
 }
 
 ImageResizer.prototype.setFile = function (file) {
@@ -17,17 +26,7 @@ ImageResizer.prototype.setFile = function (file) {
   }
 }
 
-ImageResizer.prototype.onready = function (callback) {
-  this._canvas = document.createElement("canvas");
-  this._canvas.id = "imageResizer";
-  this._canvas.style.visibility = "hidden";
-  this._context = this._canvas.getContext("2d");
-
-  this._resizingCanvas = document.createElement("canvas");
-  this._resizingContext = this._resizingCanvas.getContext("2d");
-
-  this.image = new Image();
-
+ImageResizer.prototype.prepare = function (next) {
   this.image.onload = (function () {
     this.options.maxWidth = this.image.width;
     this.options.maxHeight = this.image.height;
@@ -35,13 +34,13 @@ ImageResizer.prototype.onready = function (callback) {
     this._canvas.width = this.image.width;
     this._canvas.height = this.image.height;
 
-    callback.call(this);
+    next(null, this.image);
   }).bind(this);
 
   this.image.src = URL.createObjectURL(this.file);
 }
 
-ImageResizer.prototype.resize = function (next) {
+ImageResizer.prototype.resize = function (next, results) {
   var resizer = (function (version, next) {
     this._resizingCanvas.width = version.width;
     this._resizingCanvas.height = version.height;
@@ -56,12 +55,24 @@ ImageResizer.prototype.resize = function (next) {
   var resizeFinished = (function (err, files) {
     if(err) return next(new Error("Problem with resizing images"));
 
-    this.versions = files;
-
-    return next(null, this.versions);
+    return next(null, files);
   }).bind(this);
 
   async.mapSeries(this.options.versions, resizer, resizeFinished);
+}
+
+ImageResizer.prototype.perform = function (next) {
+  async.auto({
+    prepare: this.prepare.bind(this),
+    resize:  ['prepare', this.resize.bind(this)]
+  },
+  (function (err, results) {
+    URL.revokeObjectURL(this.image.src);
+
+    if(err) return next(err);
+
+    return next(null, results.resize);
+  }).bind(this));
 }
 
 ImageResizer.test = function (selector) {
@@ -79,9 +90,7 @@ ImageResizer.test = function (selector) {
       }
     });
 
-  imageres.onready(function () {
-    imageres.resize(function (err, files) {
-      console.log("returned resized files:", files);
-    });
+  imageres.perform(function (err, files) {
+    console.log("returned resized files:", files);
   });
 }
