@@ -23,6 +23,8 @@ ImageResizer.prototype.setFile = function (file) {
     var lastDotIndex = file.name.lastIndexOf(".");
     this.fileName = file.name.substring(0, lastDotIndex);
     this.fileExtension = file.name.substring(lastDotIndex).slice(1);
+
+    this.file.version = "original";
   }
   else {
     throw new Error("File is not an image");
@@ -51,7 +53,8 @@ ImageResizer.prototype.resize = function (next, results) {
     this._resizingContext.drawImage(this._resizingCanvas, 0, 0);
 
     this._resizingCanvas.toBlob(function (blob) {
-      blob.name = this.fileName + '_' + version.width + 'x' + version.height + '.' + this.fileExtension;
+      blob.version = version.width + 'x' + version.height
+      blob.name = this.fileName + '_' + blob.version + '.' + this.fileExtension;
       blob.lastModifiedDate = new Date();
 
       return next(null, blob);

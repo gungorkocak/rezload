@@ -3,7 +3,11 @@
     <script src="./bower_components/jquery/dist/jquery.min.js"></script>
     <script src="./bower_components/blueimp-canvas-to-blob/js/canvas-to-blob.min.js"></script>
     <script src="./bower_components/async/dist/async.min.js"></script>
+    <script src="./bower_components/eventemitter2/lib/eventemitter2.js"></script>
+    <script src="./bower_components/aws-sdk/dist/aws-sdk.min.js"></script>
     <script src="./image-resizer.js"></script>
+    <script src="./image-uploader.js"></script>
+    <script src="./rezload.js"></script>
     <script src="./rezload.jquery.js"></script>
   </head>
   <body>
@@ -17,6 +21,87 @@
       </form>
       <div id="uploader">
       </div>
+      <div>
+        <button type="submit">Upload</button>
+      </div>
     </div>
+    <script>
+      /*
+         Setup your AWS and S3 credentials below
+      */
+      AWS.config.region = "eu-central-1";
+      AWS.config.update({
+        accessKeyId: 'ACCESS_KEY_ID',
+        secretAccessKey: 'SECRET_ACCESS_KEY'
+      });
+
+      /*
+        Setup s3 instance.
+      */
+      var params = {
+        versions: [
+          {
+            width: 500,
+            height: 500
+          },
+          {
+            width: 128,
+            height: 128
+          }
+        ],
+        AWS: AWS,
+        bucket: 'rezload-images'
+      }
+
+      /*
+        Attach plugin to input with size options.
+      */
+      $('#file').rezload(params);
+
+      /*
+        Upload on form submit.
+      */
+      $("button[type=submit]").on("click", function (e) {
+
+        /*
+          Listen progress events.
+        */
+        $('#file').on('onprogress', function (e, file) {
+          // Fetch progress for different versions.
+          if(file.version === "original") {
+            console.log("original progress:", file.progress);
+          }
+          else if(file.version === "500x500") {
+            console.log("500x500 progress", file.progress);
+          }
+          else if(file.version === "128x128") {
+            console.log("128x128 progress", file.progress);
+          }
+        });
+
+        /*
+           Listen done events
+        */
+        $("#file").on("uploaddone", function (e, err, file, response) {
+          if(file.version === "original") {
+            console.log("upload done for original image", err, file, response);
+          }
+          else if(file.version === "500x500") {
+            console.log("upload done for 500x500 image", err, file, response);
+          }
+          else if(file.version === "128x128") {
+            console.log("upload done for 500x500 image", err, file, response);
+          }
+        });
+
+        $('#file').rezload('resize', function (err, files) {
+          console.log("resized images are:", files);
+        });
+
+        $('#file').rezload('perform', function (err, response) {
+          console.log("resized images are:", response);
+        });
+      });
+    </script>
   </body>
 </html>

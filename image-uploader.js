@@ -3,8 +3,6 @@ var ImageUploader = function (aws, bucket) {
   this.bucket = bucket,
   this.partSize = 10 * 1024 * 512,
   this.queueSize = 1;
-
-  console.log("AWS ", AWS);
 }
 
 ImageUploader.prototype.upload = function (file, onprogress, done) {
@@ -17,8 +15,6 @@ ImageUploader.prototype.upload = function (file, onprogress, done) {
 
   uploader.on('httpUploadProgress', function(event) {
     file.progress = (event.loaded / event.total) * 100;
-
-    console.log ("file progress is happening", file);
 
     if(typeof(onprogress) === 'function') onprogress.call(this, file, event);
   });

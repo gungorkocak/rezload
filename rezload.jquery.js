@@ -1,15 +1,28 @@
 (function ($) {
-  var resizer = null;
+  var rezload = null;
 
   $.fn.rezload = function (method, options) {
+    var plugin = this;
 
     var methods = {
       init: function (file, options) {
-        resizer = new ImageResizer(file, options);
+        rezload = new Rezload(file, options);
       },
 
       resize: function (next) {
-        resizer.perform(next);
+        rezload.resizer.perform(next);
+      },
+
+      perform: function (next) {
+        rezload.addListener('onprogress', function (file) {
+          plugin.trigger("onprogress", file);
+        });
+
+        rezload.addListener('done', function (err, file, response) {
+          plugin.trigger("uploaddone", [err, file, response]);
+        });
+
+        rezload.perform(next);
       }
     };
 
