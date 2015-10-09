@@ -136,6 +136,14 @@
         //   console.log("resized images are:", files);
         // });
 
+        /*
+          Start resize and upload.
+
+          @param action: name of the action, [perform, resize]
+          @param directory: directory for file to be put inside, optional.
+          @param callback: function to be called after performing is done.
+
+        */
         $('#file').rezload('perform', 'uploads/thumbnails', function (err, response) {
           console.log("resized images are:", response);
         });
