@@ -10,10 +10,10 @@
       },
 
       resize: function (next) {
-        rezload.resizer.perform(next);
+        rezload.resizer.perform(directory, next);
       },
 
-      perform: function (next) {
+      perform: function (directory, next) {
         rezload.addListener('onprogress', function (file) {
           plugin.trigger("onprogress", file);
         });
@@ -22,7 +22,7 @@
           plugin.trigger("uploaddone", [err, file, response]);
         });
 
-        rezload.perform(next);
+        rezload.perform(directory, next);
       }
     };
 

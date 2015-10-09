@@ -9,7 +9,11 @@ Rezload.prototype.resize = function (next) {
   this.resizer.perform(next);
 }
 
-Rezload.prototype.perform = function (next) {
+Rezload.prototype.perform = function (directory, next) {
+  if(typeof(directory) === 'function')
+    next = directory
+
+
   this.resize(function (err, files) {
     if(err) return next(err);
 
@@ -24,7 +28,13 @@ Rezload.prototype.perform = function (next) {
         next(err, response);
       }.bind(this);
 
-      this.uploader.upload(file, onprogress, done);
+      if(typeof(directory) === "string") {
+        this.uploader.upload(file, directory, onprogress, done);
+      }
+      else {
+        this.uploader.upload(file, null, onprogress, done);
+      }
+
     }.bind(this);
 
     async.mapSeries(files, uploadFile, next);

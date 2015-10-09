@@ -136,7 +136,7 @@
         //   console.log("resized images are:", files);
         // });
 
-        $('#file').rezload('perform', function (err, response) {
+        $('#file').rezload('perform', 'uploads/thumbnails', function (err, response) {
           console.log("resized images are:", response);
         });
       });

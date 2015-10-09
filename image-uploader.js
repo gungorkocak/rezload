@@ -5,12 +5,21 @@ var ImageUploader = function (aws, bucket) {
   this.queueSize = 1;
 }
 
-ImageUploader.prototype.upload = function (file, onprogress, done) {
+ImageUploader.prototype.upload = function (file, directory, onprogress, done) {
+  var key = "";
+
+  if(typeof(directory) === "string") {
+    key = directory + "/" + file.name;
+  }
+  else {
+    key = file.name;
+  }
+
   var uploader =
     new this.AWS.S3.ManagedUpload({
       partSize: this.partSize,
       queueSize: this.queueSize,
-      params: {Bucket: this.bucket, Key: file.name, Body: file}
+      params: {Bucket: this.bucket, Key: key, Body: file}
     });
 
   uploader.on('httpUploadProgress', function(event) {
